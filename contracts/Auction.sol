@@ -10,6 +10,7 @@ contract Auction {
     address internal sellerAddress;
     address internal winnerAddress;
     uint winningPrice;
+    uint winnerChange;
     bool canSellerWithdraw;
     bool canWinnerWithdraw;
 
@@ -99,14 +100,20 @@ contract Auction {
             revert("Unauthorized withdraw");
         }
         if (msg.sender == winnerAddress && !canWinnerWithdraw) {
-            return;
+            payable(msg.sender).transfer(winnerChange);
+            winnerChange = 0;
         }
         if (msg.sender == sellerAddress && !canSellerWithdraw) {
             return;
         }
         canSellerWithdraw = false;
         canWinnerWithdraw = false;
-        payable(msg.sender).transfer(winningPrice);
+        uint total_amount = winningPrice;
+        if (msg.sender == winnerAddress) {
+            total_amount = total_amount + winnerChange;
+        }
+        winningPrice = 0;
+        payable(msg.sender).transfer(total_amount);
     }
 
 }

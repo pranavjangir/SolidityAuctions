@@ -30,6 +30,21 @@ contract DutchAuction is Auction {
 
     function bid() public payable{
         // TODO: place your code here
+        if (winnerAddress != address(0)) {
+            revert(); // We already found a winner.
+        }
+        uint currentPrice = initialPrice;
+        uint curTime = time();
+        if (curTime >= biddingPeriod) {
+            revert();
+        }
+        currentPrice = currentPrice - curTime*offerPriceDecrement;
+        if (msg.value < currentPrice) {
+            revert("Low bid value");
+        } else if (msg.value > currentPrice) {
+            winnerChange = msg.value - currentPrice;
+        }
+        winnerAddress = msg.sender;
     }
 
 }
