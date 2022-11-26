@@ -10,6 +10,8 @@ contract Auction {
     address internal sellerAddress;
     address internal winnerAddress;
     uint winningPrice;
+    bool canSellerWithdraw;
+    bool canWinnerWithdraw;
 
     // TODO: place your code here
 
@@ -27,6 +29,8 @@ contract Auction {
           sellerAddress = msg.sender;
         winnerAddress = _winnerAddress;
         winningPrice = _winningPrice;
+        canSellerWithdraw = false;
+        canWinnerWithdraw = false;
     }
 
     // This is provided for testing
@@ -51,12 +55,34 @@ contract Auction {
     // If a judge is specified, then only the judge or winning bidder may call.
     function finalize() public virtual {
         // TODO: place your code here
+        if (msg.sender == sellerAddress || 
+        (winnerAddress == address(0) && judgeAddress != address(0)
+         && msg.sender == judgeAddress)) {
+            revert();
+        }
+        if (judgeAddress != address(0) && winnerAddress != address(0) && 
+        !(msg.sender == judgeAddress || msg.sender == winnerAddress)) {
+            revert();
+        }
+        if (winnerAddress == address(0)) {
+            winnerAddress = msg.sender;
+        }
+        if (canSellerWithdraw == false) {
+            canSellerWithdraw = true;
+        }
     }
 
     // This can ONLY be called by seller or the judge (if a judge exists).
     // Money should only be refunded to the winner.
     function refund() public {
-        // TODO: place your code here
+        if (msg.sender != sellerAddress && msg.sender != judgeAddress) {
+            revert();
+        }
+        if (winnerAddress == address(0)) {
+            // No winner yet, so not even judge should be able to call this.
+            revert();
+        }
+        canWinnerWithdraw = true;
     }
 
     // Withdraw funds from the contract.
@@ -66,6 +92,21 @@ contract Auction {
     // re-entrancy or unchecked-spend vulnerabilities.
     function withdraw() public {
         //TODO: place your code here
+        if (winnerAddress == address(0)) {
+            revert("No winner yet, cannot withdraw");
+        }
+        if (msg.sender != winnerAddress && msg.sender != sellerAddress) {
+            revert("Unauthorized withdraw");
+        }
+        if (msg.sender == winnerAddress && !canWinnerWithdraw) {
+            return;
+        }
+        if (msg.sender == sellerAddress && !canSellerWithdraw) {
+            return;
+        }
+        canSellerWithdraw = false;
+        canWinnerWithdraw = false;
+        payable(msg.sender).transfer(winningPrice);
     }
 
 }
