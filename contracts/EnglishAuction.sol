@@ -52,25 +52,6 @@ contract EnglishAuction is Auction {
         if (winnerAddress == address(0)) {
             revert("No winner yet, cannot withdraw");
         }
-        // if (msg.sender != winnerAddress && msg.sender != sellerAddress) {
-        //     revert("Unauthorized withdraw");
-        // }
-        // if (msg.sender == winnerAddress && !canWinnerWithdraw) {
-        //     payable(msg.sender).transfer(winnerChange);
-        //     winnerChange = 0;
-        //     return;
-        // }
-        // if (msg.sender == sellerAddress && !canSellerWithdraw) {
-        //     return;
-        // }
-        // canSellerWithdraw = false;
-        // canWinnerWithdraw = false;
-        // uint total_amount = winningPrice;
-        // if (msg.sender == winnerAddress) {
-        //     total_amount = total_amount + winnerChange;
-        // }
-        // winningPrice = 0;
-        // payable(msg.sender).transfer(total_amount);
         if (msg.sender == winnerAddress) {
             if (canWinnerWithdraw) {
                 canWinnerWithdraw = false;
