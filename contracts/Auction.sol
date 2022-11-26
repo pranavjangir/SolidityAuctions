@@ -91,7 +91,7 @@ contract Auction {
     // This should be the *only* place the contract ever transfers funds out.
     // Ensure that your withdrawal functionality is not vulnerable to
     // re-entrancy or unchecked-spend vulnerabilities.
-    function withdraw() public {
+    function withdraw() public virtual {
         //TODO: place your code here
         if (winnerAddress == address(0)) {
             revert("No winner yet, cannot withdraw");
