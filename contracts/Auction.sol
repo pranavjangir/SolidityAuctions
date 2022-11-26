@@ -102,6 +102,7 @@ contract Auction {
         if (msg.sender == winnerAddress && !canWinnerWithdraw) {
             payable(msg.sender).transfer(winnerChange);
             winnerChange = 0;
+            return;
         }
         if (msg.sender == sellerAddress && !canSellerWithdraw) {
             return;
