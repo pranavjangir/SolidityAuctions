@@ -56,9 +56,9 @@ contract Auction {
     // If a judge is specified, then only the judge or winning bidder may call.
     function finalize() public virtual {
         // TODO: place your code here
-        if (msg.sender == sellerAddress || 
-        (winnerAddress == address(0) && judgeAddress != address(0)
+        if ((winnerAddress == address(0) && judgeAddress != address(0)
          && msg.sender == judgeAddress)) {
+            // judge cannot call before there is a winner.
             revert();
         }
         if (judgeAddress != address(0) && winnerAddress != address(0) && 
